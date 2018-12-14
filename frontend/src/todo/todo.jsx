@@ -5,7 +5,7 @@ import PageHeader from '../template/pageHeader'
 import TodoForm from './todoForm'
 import TodoList from './todoList'
 
-const URL ='http://localhost:3003/api/todos'
+const URL ='http://localhost:3003/api/todo'
 
 export default class Todo extends Component {
     constructor(props){
@@ -14,8 +14,12 @@ export default class Todo extends Component {
 
         this.heandleChange = this.heandleChange.bind(this)
         this.handleAdd = this.handleAdd.bind(this)
+        this.refresh()
     }
-    
+    refresh(){
+        axios.get(`${URL}?sort=-createdAt`)
+            .then(resp=> this.setState({...this.state, description:'', list: resp.data}))
+    }
     heandleChange(e){
         this.setState({...this.state, description: e.target.value })
     }
@@ -23,7 +27,7 @@ export default class Todo extends Component {
     handleAdd(){
         const description = this.state.description
         axios.post(URL, { description })
-            .then(resp => console.log('Funcionou!'))
+            .then(resp => this.refresh())
     }
     render(){
         return (
