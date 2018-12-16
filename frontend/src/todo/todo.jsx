@@ -14,6 +14,7 @@ export default class Todo extends Component {
 
         this.heandleChange = this.heandleChange.bind(this)
         this.handleAdd = this.handleAdd.bind(this)
+        this.heandleSearch = this.heandleSearch.bind(this)
 
         this.handleMarkAsPending = this.handleMarkAsPending.bind(this)
         this.handleMarkAsDone = this.handleMarkAsDone.bind(this)
@@ -21,14 +22,18 @@ export default class Todo extends Component {
 
         this.refresh()
     }
-    refresh(){
-        axios.get(`${URL}?sort=-createdAt`)
-            .then(resp=> this.setState({...this.state, description:'', list: resp.data}))
+    refresh(description=''){
+        const search = description ? `&description__regex=/${description}/` : ''
+        axios.get(`${URL}?sort=-createdAt${search}`)
+            .then(resp=> this.setState({...this.state, description, 
+            list: resp.data}))
     }
     heandleChange(e){
         this.setState({...this.state, description: e.target.value })
     }
-
+    heandleSearch(){
+        this.refresh(this.state.description)
+    }
     handleAdd(){
         const description = this.state.description
         axios.post(URL, { description })
@@ -36,22 +41,23 @@ export default class Todo extends Component {
     }
     handleRemove(todo){
         axios.delete(`${URL}/${todo._id}`)
-            .then(resp => this.refresh())
+            .then(resp => this.refresh(this.state.decription))
     }
     handleMarkAsDone(todo){
         axios.put(`${URL}/${todo._id}`, { ...todo, done:true})
-            .then(resp => this.refresh())
+            .then(resp => this.refresh(this.state.description))
     }
     handleMarkAsPending(todo){
         axios.put(`${URL}/${todo._id}`, { ...todo, done:false })
-            .then(resp => this.refresh())
+            .then(resp => this.refresh(this.state.description))
     }
     render(){
         return (
             <div>
                 <PageHeader name='Tarefas' small='Cadastro'></PageHeader>
                 <TodoForm description={this.state.description}
-                handleAdd={this.handleAdd} heandleChange={this.heandleChange} />
+                handleAdd={this.handleAdd} heandleChange={this.heandleChange} 
+                heandleSearch={this.heandleSearch} />
                 <TodoList list={this.state.list} handleRemove={this.handleRemove} 
                     handleMarkAsDone={this.handleMarkAsDone} 
                     handleMarkAsPending={this.handleMarkAsPending} />
