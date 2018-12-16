@@ -31,7 +31,7 @@ export default props =>{
                     <th>
                         Descrição
                     </th>
-                    <th>Ações</th>
+                    <th className='tableActions'>Ações</th>
                 </tr>
             </thead>
             <tbody>
